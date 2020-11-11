@@ -265,9 +265,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   b: []
-  f1: 0
-  f2: 0
-  f3: 0
+  f1: 10
+  f2: 10
+  f3: 10
 --- !u!1 &6658355607558128915
 GameObject:
   m_ObjectHideFlags: 0
