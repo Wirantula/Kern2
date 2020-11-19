@@ -23,6 +23,7 @@ public class Astar
     /// <returns></returns>
     public List<Vector2Int> FindPathToTarget(Vector2Int startPos, Vector2Int endPos, Cell[,] grid)
     {
+        start.position = startPos;
         openList.Clear();
         closedList.Clear();
         path.Clear();
@@ -56,7 +57,6 @@ public class Astar
                     adjacentSquare.parent = currentNode;
                 }
             }
-            start.position = currentNode.position;
             path.Add(currentNode.position); 
 
         }
