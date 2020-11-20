@@ -10,8 +10,10 @@ public class Astar
     public List<Node> closedList = new List<Node>();
     public List<Node> adjacentSquares = new List<Node>();
     public List<Vector2Int> path = new List<Vector2Int>();
+    public Vector2Int endGoal;
     public Node start = new Node();
     public int gscore = 0;
+    public Node currentNode = new Node();
     /// <summary>
     /// TODO: Implement this function so that it returns a list of Vector2Int positions which describes a path
     /// Note that you will probably need to add some helper functions
@@ -24,6 +26,7 @@ public class Astar
     public List<Vector2Int> FindPathToTarget(Vector2Int startPos, Vector2Int endPos, Cell[,] grid)
     {
         start.position = startPos;
+        endGoal = endPos;
         openList.Clear();
         closedList.Clear();
         path.Clear();
@@ -31,7 +34,7 @@ public class Astar
         while (openList.Count > 0)
         {
             var lowest = openList.Min(l => l.FScore);
-            Node currentNode = openList.First(l => l.FScore == lowest);
+            currentNode = openList.First(l => l.FScore == lowest);
             closedList.Add(currentNode);
             openList.Remove(currentNode);
             if (closedList.FirstOrDefault(l => l.position.x == endPos.x && l.position.y == endPos.y) != null) break;
@@ -46,7 +49,6 @@ public class Astar
                 if(openList.FirstOrDefault(l => l.position.x == adjacentSquare.position.x && l.position.y == adjacentSquare.position.y) == null)
                 {
                     adjacentSquare.GScore = gscore;
-                    adjacentSquare.HScore = CalcHScore(adjacentSquare.position, endPos);
                     adjacentSquare.parent = currentNode;
 
                     openList.Insert(0, adjacentSquare);
@@ -57,9 +59,17 @@ public class Astar
                     adjacentSquare.parent = currentNode;
                 }
             }
-            path.Add(currentNode.position); 
 
         }
+        if (currentNode.position == endPos)
+        {
+            while (currentNode.parent != null)
+            {
+                path.Add(currentNode.position);
+                currentNode = currentNode.parent;
+            }
+        }
+        path.Reverse();
         return path;
     }
 
@@ -68,25 +78,29 @@ public class Astar
         return (Mathf.Abs(endPos.x - startPos.x) + Mathf.Abs(endPos.y - startPos.y));
     }
 
-    public static List<Node> GetWalkableAdjecent(Vector2Int pos, Cell[,] grid)
+    public List<Node> GetWalkableAdjecent(Vector2Int pos, Cell[,] grid)
     {
         List<Node> possibleLocations = new List<Node>();
         possibleLocations.Clear();
         if (!grid[pos.x, pos.y].HasWall(Wall.DOWN))
         {
-            possibleLocations.Add( new Node(new Vector2Int(pos.x, pos.y - 1), null, 0, 0));
+            Vector2Int nextPos = new Vector2Int(pos.x, pos.y - 1);
+            possibleLocations.Add( new Node(nextPos, null, 0, CalcHScore(nextPos, endGoal)));
         }
         if (!grid[pos.x, pos.y].HasWall(Wall.UP))
         {
-            possibleLocations.Add( new Node(new Vector2Int(pos.x, pos.y + 1), null, 0, 0));
+            Vector2Int nextPos = new Vector2Int(pos.x, pos.y + 1);
+            possibleLocations.Add( new Node(nextPos, null, 0, CalcHScore(nextPos, endGoal)));
         }
         if (!grid[pos.x, pos.y].HasWall(Wall.LEFT))
         {
-            possibleLocations.Add( new Node(new Vector2Int(pos.x - 1, pos.y), null, 0, 0));
+            Vector2Int nextPos = new Vector2Int(pos.x - 1, pos.y);
+            possibleLocations.Add( new Node(nextPos, null, 0, CalcHScore(nextPos, endGoal)));
         }
         if (!grid[pos.x, pos.y].HasWall(Wall.RIGHT))
         {
-            possibleLocations.Add( new Node(new Vector2Int(pos.x + 1, pos.y), null, 0, 0));
+            Vector2Int nextPos = new Vector2Int(pos.x + 1, pos.y);
+            possibleLocations.Add( new Node(nextPos, null, 0, CalcHScore(nextPos, endGoal)));
         }
         return possibleLocations;
     }
